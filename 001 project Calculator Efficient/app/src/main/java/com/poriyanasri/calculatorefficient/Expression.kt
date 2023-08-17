@@ -1,11 +1,11 @@
 package com.poriyanasri.calculatorefficient
 
+import android.util.Log
 import java.util.Stack
 
 class Expression(var infixExpression: MutableList<String>) {
-
-
-    private fun infixToPostfix(): String {
+    private var postfix: String = ""
+    private fun infixToPostfix() {
         var result = ""
         val stack = Stack<String>()
         for (element in infixExpression) {
@@ -23,24 +23,25 @@ class Expression(var infixExpression: MutableList<String>) {
                 while (stack.isNotEmpty() && precedence(stack.peek()) >= precedence(element)) {
                     result += "${stack.pop()} "
                 }
+                stack.push(element)
             }
         }
         while (stack.isNotEmpty()) {
             result += "${stack.pop()} "
         }
-        return result
+        postfix = result
     }
 
     private fun precedence(operator: String): Int {
         return when (operator) {
-            "*", "/" -> 2
+            "×", "÷" -> 2
             "+", "-" -> 1
             else -> -1
         }
-
     }
 
-    fun evaluateExpression(postfix: String): Number {
+    fun evaluateExpression(): Number {
+        infixToPostfix()
         val stack = Stack<Double>()
         var i = 0
         while (i < postfix.length) {
@@ -58,10 +59,10 @@ class Expression(var infixExpression: MutableList<String>) {
                 val x = stack.pop()
                 val y = stack.pop()
                 when (postfix[i]) {
-                    '*' -> stack.push(x * y)
-                    '/' -> stack.push(x / y)
-                    '+' -> stack.push(x + y)
-                    '-' -> stack.push(x - y)
+                    '×' -> stack.push(y * x)
+                    '÷' -> stack.push(y / x)
+                    '+' -> stack.push(y + x)
+                    '-' -> stack.push(y - x)
                 }
             }
             i++
